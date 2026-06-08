@@ -5,7 +5,7 @@ from sqlalchemy.orm import relationship
 
 # Database Models
 
-# User Model
+# User Model - represents users in the system
 class Users(Base):
     __tablename__ = "users"
     
@@ -13,3 +13,5 @@ class Users(Base):
     user_name = Column(String, nullable=False, unique=True)
     user_password = Column(String, nullable=False)
     
+    # Establish relationship with Alerts
+    alerts = relationship("Alerts", back_populates="user")
