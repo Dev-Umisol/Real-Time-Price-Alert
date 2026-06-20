@@ -28,6 +28,12 @@ class UserToken(BaseModel):
     
     access_token: str
     token_type: str
+    
+class UserCreateAlert(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    
+    coin_name: str
+    coin_price_threshold: float
 
 # Schema for creating a new alert
 class UserAlertResponse(BaseModel):
