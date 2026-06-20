@@ -28,7 +28,8 @@ class UserToken(BaseModel):
     
     access_token: str
     token_type: str
-    
+
+# Schema for creating a new alert
 class UserCreateAlert(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     
