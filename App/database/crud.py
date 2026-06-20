@@ -17,3 +17,8 @@ def create_user(db: Session, user: schemas.UserRegistration) -> models.Users:
     db.refresh(db_user)
     
     return db_user
+
+# Retrieve a user by their username
+def get_user_by_username(db: Session, user_name: str) -> models.Users | None:
+    return db.query(models.Users).filter(models.Users.user_name == user_name).first()
+
