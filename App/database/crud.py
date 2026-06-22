@@ -44,3 +44,15 @@ def get_alert_by_id(db: Session, alert_id: int) -> models.Alerts | None:
 # Retrieve all active alerts
 def get_all_active_alerts(db: Session) -> list[models.Alerts]:
     return db.query(models.Alerts).filter(models.Alerts.is_active == True).all()
+
+# delete an alert by its ID
+def delete_alert(db: Session, alert_id: int) -> models.Alerts:
+    del_alert = db.query(models.Alerts).filter(models.Alerts.alert_id == alert_id).first()
+    
+    if del_alert is None:
+        raise HTTPException(status_code=404, detail="Alert not found")
+    
+    db.delete(del_alert)
+    db.commit()
+    
+    return del_alert
