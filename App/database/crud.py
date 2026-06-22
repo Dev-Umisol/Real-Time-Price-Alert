@@ -40,3 +40,7 @@ def create_new_alert(db: Session, user_id: int, alert: schemas.UserCreateAlert) 
 # Retrieve an alert by its ID
 def get_alert_by_id(db: Session, alert_id: int) -> models.Alerts | None:
     return db.query(models.Alerts).filter(models.Alerts.alert_id == alert_id).first()
+
+# Retrieve all active alerts
+def get_all_active_alerts(db: Session) -> list[models.Alerts]:
+    return db.query(models.Alerts).filter(models.Alerts.is_active == True).all()
