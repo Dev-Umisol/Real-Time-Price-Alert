@@ -1,6 +1,7 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from pwdlib import PasswordHash
+from datetime import datetime, timezone
 from . import models, schemas
 
 # CRUD Operations for Users
@@ -56,3 +57,20 @@ def delete_alert(db: Session, alert_id: int) -> models.Alerts:
     db.commit()
     
     return del_alert
+
+# Update an alert's fired status and timestamp
+def update_alert_fired(db: Session, alert_id: int) -> models.Alerts:
+    update_alert = db.query(models.Alerts).filter(models.Alerts.alert_id == alert_id).first()
+    
+    # If the alert is not found, raise an HTTPException with a 404 status code
+    if not update_alert:
+        raise HTTPException(status_code=404, detail="Alert not found")
+    
+    # Update the alert's fired timestamp and set it as inactive
+    update_alert.alert_fired_at = datetime.now(timezone.utc) # type: ignore
+    update_alert.is_active = False # type: ignore
+    
+    db.commit()
+    db.refresh(update_alert)
+    
+    return update_alert
