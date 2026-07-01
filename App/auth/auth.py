@@ -20,3 +20,13 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="user/login")
 
 if SECRET_KEY is None:
     raise ValueError("SECRET_KEY is not set in the environment variables.")
+
+# Create an access token
+def create_access_token(user_name: str):
+    payload = {
+        "action": "login",
+        "sub": user_name,
+        "exp": datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    }
+    
+    return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
