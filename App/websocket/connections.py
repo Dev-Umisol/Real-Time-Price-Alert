@@ -11,8 +11,14 @@ class ConnectionManager:
         await websocket.accept()
         self.active_connections[client_id] = websocket
     
+    # Disconnects a WebSocket connection and removes it from the active connections dictionary
     def disconnect(self, client_id: str) -> None:
         # Removes a WebSocket connection from the active connections dictionary
         if client_id in self.active_connections:
             del self.active_connections[client_id]
     
+    # Sends a notification message to a specific WebSocket connection by client_id
+    async def send_notification(self, client_id: str, message: str) -> None:
+        # Sends a message to a specific WebSocket connection if it exists in the active connections dictionary
+        if client_id in self.active_connections:
+            await self.active_connections[client_id].send_text(message)
