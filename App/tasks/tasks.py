@@ -23,3 +23,19 @@ celery_app = Celery(
     broker=REDIS_URL,
     backend=REDIS_URL
 )
+
+# Celery task to check cryptocurrency prices and notify users if the price exceeds their set limit.
+@celery_app.task
+def check_crypto_prices():
+    """
+    Celery task to check cryptocurrency prices and notify users if the price exceeds their set limit.
+    """
+    with Session(engine) as session:
+        active_alerts = crud.get_all_active_alerts(session)
+
+        for alert in active_alerts:
+            current_coin_price = get_coin_price(alert.coin_name)
+            
+            if current_coin_price is not None and current_coin_price <= alert.coin_price_threshold:
+                # Notify the user via WebSocket
+                connection_manager = connections.ConnectionManager()

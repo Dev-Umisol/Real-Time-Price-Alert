@@ -22,3 +22,5 @@ class ConnectionManager:
         # Sends a message to a specific WebSocket connection if it exists in the active connections dictionary
         if client_id in self.active_connections:
             await self.active_connections[client_id].send_text(message)
+    
+connection_manager = ConnectionManager()
