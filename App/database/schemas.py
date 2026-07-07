@@ -36,7 +36,7 @@ class UserCreateAlert(BaseModel):
     coin_name: str
     coin_price_threshold: float
 
-# Schema for creating a new alert
+# Schema for user alert response
 class UserAlertResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     
