@@ -1,4 +1,5 @@
 import os
+import asyncio
 
 from celery import Celery
 from dotenv import load_dotenv
@@ -7,7 +8,7 @@ from sqlalchemy.orm import Session
 from app.database import crud
 from app.database.database import engine
 from app.services.coingecko import get_coin_price
-from app.websocket import connections
+from app.websocket.connections import connection_manager
 
 # Load environment variables from .env file
 load_dotenv()
@@ -33,9 +34,12 @@ def check_crypto_prices():
     with Session(engine) as session:
         active_alerts = crud.get_all_active_alerts(session)
 
+        # Loop through each active alert and check the current price of the specified cryptocurrency.
         for alert in active_alerts:
-            current_coin_price = get_coin_price(alert.coin_name)
+            current_coin_price = get_coin_price(alert.coin_name) # type: ignore
             
-            if current_coin_price is not None and current_coin_price <= alert.coin_price_threshold:
+            # If the current price is less than or equal to the user's set threshold, send a notification and mark the alert as fired.
+            if current_coin_price is not None and current_coin_price <= alert.coin_price_threshold: # type: ignore
                 # Notify the user via WebSocket
-                connection_manager = connections.ConnectionManager()
+                asyncio.run(connection_manager.send_notification(alert.user_id, f"Price alert: {alert.coin_name} has reached ${current_coin_price}.")) # type: ignore
+                crud.update_alert_fired(session, alert.alert_id) # type: ignore
