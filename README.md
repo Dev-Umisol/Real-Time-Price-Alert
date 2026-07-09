@@ -1,6 +1,6 @@
 # Real-Time Crypto Price Alert Engine
 
-> A production-style backend API built with FastAPI that lets authenticated users set price threshold alerts on any CoinGecko-listed cryptocurrency — with a Celery background worker polling prices and WebSocket push notifications delivered the moment a threshold is crossed.
+> A production-style backend API built with FastAPI that lets authenticated users set price threshold alerts on any CoinGecko-listed cryptocurrency, with a Celery background worker polling prices and WebSocket push notifications delivered the moment a threshold is crossed.
 
 ![Python](https://img.shields.io/badge/Python-3.x-blue?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-REST%20API-009688?logo=fastapi&logoColor=white)
