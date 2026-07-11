@@ -55,3 +55,16 @@ def create_alert(alert: schemas.UserCreateAlert, db=Depends(get_db), current_use
     new_alert = crud.create_new_alert(db, current_user.id, alert) # Create a new alert in the database for the current user
     
     return new_alert
+
+# Alert retrieval endpoint
+@app.get('/alerts/{id}', response_model=schemas.UserAlertResponse)
+def get_alert(id: int, db=Depends(get_db), current_user=Depends(auth.get_current_user)):
+    """
+    Get a specific alert by ID for the current user
+    """
+    alert = crud.get_alert_by_id(db, id) # Retrieve the alert from the database using the provided ID
+    
+    if alert is None or alert.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Access denied") # Raise an error if the alert does not exist or does not belong to the current user
+    
+    return alert
