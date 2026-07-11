@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException, WebSocket
+from pwdlib import PasswordHash
 
 from app.auth import auth
 from app.database import crud, schemas, models
@@ -24,3 +25,23 @@ def register_user(user: schemas.UserRegistration, db=Depends(get_db)):
     new_user = crud.create_user(db, user) # Create a new user in the database using the provided user registration data
     
     return new_user
+
+# User login endpoint
+@app.post('/users/login', response_model=schemas.UserToken)
+def user_login(user: schemas.UserLogin, db=Depends(get_db)):
+    """
+    User login endpoint
+    """
+    password_hash = PasswordHash.recommended()
+    db_user = crud.get_user_by_username(db, user.user_name) # Retrieve the user's password from the database using the provided username
+    
+    if db_user is None:
+        raise HTTPException(status_code=401, detail="Invalid username or password")
+    
+    # Verify the provided password against the stored hashed password
+    is_valid = password_hash.verify(user.user_password, db_user.user_password) # type: ignore
+    
+    if not is_valid:
+        raise HTTPException(status_code=401, detail="Invalid username or password")
+    
+    return {"access_token": auth.create_access_token(user.user_name), "token_type": "bearer"}
