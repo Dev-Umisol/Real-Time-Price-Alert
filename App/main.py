@@ -45,3 +45,13 @@ def user_login(user: schemas.UserLogin, db=Depends(get_db)):
         raise HTTPException(status_code=401, detail="Invalid username or password")
     
     return {"access_token": auth.create_access_token(user.user_name), "token_type": "bearer"}
+
+# Alert creation endpoint
+@app.post('/alerts', response_model=schemas.UserAlertResponse, status_code=201)
+def create_alert(alert: schemas.UserCreateAlert, db=Depends(get_db), current_user=Depends(auth.get_current_user)):
+    """
+    Create a new alert for the current user
+    """
+    new_alert = crud.create_new_alert(db, current_user.id, alert) # Create a new alert in the database for the current user
+    
+    return new_alert
