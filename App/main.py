@@ -68,3 +68,18 @@ def get_alert(id: int, db=Depends(get_db), current_user=Depends(auth.get_current
         raise HTTPException(status_code=403, detail="Access denied") # Raise an error if the alert does not exist or does not belong to the current user
     
     return alert
+
+# Alert deletion endpoint
+@app.delete('/alerts/{id}')
+def delete_alert(id: int, db=Depends(get_db), current_user=Depends(auth.get_current_user)):
+    """
+    Delete a specific alert by ID for the current user
+    """
+    alert = crud.get_alert_by_id(db, id) # Retrieve the alert from the database using the provided ID
+    
+    if alert is None or alert.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Access denied") # Raise an error if the alert does not exist or does not belong to the current user
+    
+    crud.delete_alert(db, id) # Delete the alert from the database
+    
+    return {"detail": "Alert deleted successfully"}
