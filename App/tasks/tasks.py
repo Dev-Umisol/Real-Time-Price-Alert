@@ -1,7 +1,7 @@
 import os
 import asyncio
 
-from celery import Celery
+from celery import Celery, schedules
 from dotenv import load_dotenv
 from sqlalchemy.orm import Session
 
@@ -25,6 +25,14 @@ celery_app = Celery(
     backend=REDIS_URL
 )
 
+# Configure Celery beat schedule to run the check_crypto_prices task every minute
+celery_app.conf.beat_schedule = {
+    "check-crypto-prices-every-minute": {
+        "task": "app.tasks.tasks.check_crypto_prices",
+        "schedule": 60,  # Run every minute
+    },
+}
+
 # Celery task to check cryptocurrency prices and notify users if the price exceeds their set limit.
 @celery_app.task
 def check_crypto_prices():
@@ -43,3 +51,4 @@ def check_crypto_prices():
                 # Notify the user via WebSocket
                 asyncio.run(connection_manager.send_notification(alert.user_id, f"Price alert: {alert.coin_name} has reached ${current_coin_price}.")) # type: ignore
                 crud.update_alert_fired(session, alert.alert_id) # type: ignore
+
