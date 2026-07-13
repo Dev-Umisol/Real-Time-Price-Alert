@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, WebSocket
+from fastapi import FastAPI, Depends, HTTPException, WebSocket, WebSocketDisconnect
 from pwdlib import PasswordHash
 
 from app.auth import auth
@@ -83,3 +83,18 @@ def delete_alert(id: int, db=Depends(get_db), current_user=Depends(auth.get_curr
     crud.delete_alert(db, id) # Delete the alert from the database
     
     return {"detail": "Alert deleted successfully"}
+
+# WebSocket endpoint for real-time notifications
+@app.websocket('/ws/{user_id}')
+async def websocket_endpoint(websocket: WebSocket, user_id: str):
+    """
+    WebSocket endpoint for real-time notifications
+    """
+    await connection_manager.connect(websocket, user_id) # Connect the WebSocket and store it in the connection manager
+    
+    try:
+        while True:
+            data = await websocket.receive_text() # Wait for incoming messages from the WebSocket
+            await websocket.send_text(f"Message received: {data}") # Echo the received message back to the client
+    except WebSocketDisconnect:
+        connection_manager.disconnect(user_id) # Disconnect the WebSocket and remove it from the connection manager when the client disconnects
