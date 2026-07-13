@@ -1,7 +1,7 @@
 import os
 import asyncio
 
-from celery import Celery, schedules
+from celery import Celery
 from dotenv import load_dotenv
 from sqlalchemy.orm import Session
 
@@ -49,6 +49,6 @@ def check_crypto_prices():
             # If the current price is less than or equal to the user's set threshold, send a notification and mark the alert as fired.
             if current_coin_price is not None and current_coin_price <= alert.coin_price_threshold: # type: ignore
                 # Notify the user via WebSocket
-                asyncio.run(connection_manager.send_notification(alert.user_id, f"Price alert: {alert.coin_name} has reached ${current_coin_price}.")) # type: ignore
+                asyncio.run(connection_manager.send_notification(str(alert.user_id), f"Price alert: {alert.coin_name} has reached ${current_coin_price}."))
                 crud.update_alert_fired(session, alert.alert_id) # type: ignore
 
