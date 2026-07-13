@@ -16,7 +16,7 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 # OAuth2 scheme for token extraction
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="user/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="users/login")
 
 if SECRET_KEY is None:
     raise ValueError("SECRET_KEY is not set in the environment variables.")
