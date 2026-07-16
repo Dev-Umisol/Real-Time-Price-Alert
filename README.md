@@ -10,6 +10,7 @@
 ![Celery](https://img.shields.io/badge/Worker-Celery-37814A?logo=celery&logoColor=white)
 ![Redis](https://img.shields.io/badge/Broker-Redis-DC382D?logo=redis&logoColor=white)
 ![WebSocket](https://img.shields.io/badge/Realtime-WebSocket-010101?logo=websocket&logoColor=white)
+![pytest](https://img.shields.io/badge/Tested-pytest-0A9EDC?logo=pytest&logoColor=white)
 ![Status](https://img.shields.io/badge/Status-Complete-brightgreen)
 
 ---
@@ -49,6 +50,7 @@ Built to demonstrate real world async backend skills: background task scheduling
 | External Price Data | CoinGecko API (`httpx`)             |
 | Real Time Transport | WebSocket (FastAPI native)          |
 | Config Management   | `python-dotenv`                     |
+| Testing             | pytest                              |
 
 ---
 
@@ -91,6 +93,11 @@ app/
 │
 └── websocket/
     └── connections.py       # WebSocket connection manager: tracks active sessions, pushes notifications
+
+tests/
+│
+├── test_auth.py             # Unit tests for JWT token creation and payload validation
+└── test_coingecko.py        # Unit tests for CoinGecko price fetching (valid and invalid coins)
 ```
 
 - **`auth/auth.py`** handles all identity logic — JWT creation, decoding, and the `get_current_user` dependency injected into protected routes
@@ -126,6 +133,25 @@ Alert marked is_active = False, alert_fired_at = timestamp
 
 ---
 
+## Tests
+
+Unit tests are written with `pytest` and cover core business logic without requiring a running server or database.
+
+```bash
+# Run all tests
+pytest tests/ -v
+```
+
+| Test File            | Function                        | What It Verifies                                      |
+| -------------------- | ------------------------------- | ----------------------------------------------------- |
+| `test_auth.py`       | `test_create_access_token`      | JWT payload contains correct `sub`, `action`, `exp`   |
+| `test_coingecko.py`  | `test_get_coin_price_valid`     | Returns a positive float for a valid coin             |
+| `test_coingecko.py`  | `test_get_coin_price_invalid`   | Returns `None` for an unrecognized coin ID            |
+
+Tests also caught and fixed two real bugs during development: CoinGecko returning integers instead of floats, and a `float(None)` crash on invalid coin names.
+
+---
+
 ## Security
 
 - Passwords hashed with `pwdlib[argon2]` plaintext passwords are never stored
@@ -149,11 +175,6 @@ source .venv/bin/activate  # Mac/Linux
 
 # Install dependencies
 pip install -r requirements.txt
-
-# Create a .env file with the following values
-DATABASE_URL=postgresql://username:password@localhost:5432/real-time-price-alert
-SECRET_KEY=your-secret-key-here
-REDIS_URL=redis://localhost:6379/0
 
 # Generate a secret key
 python -c "import secrets; print(secrets.token_hex(32))"
