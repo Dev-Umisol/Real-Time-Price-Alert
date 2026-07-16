@@ -7,7 +7,8 @@ def get_coin_price(coin_name: str) -> float | None:
     # Check if the request was successful
     if response.status_code == 200:
         data = response.json()
+        price = data.get(coin_name, {}).get("usd")
         
-        return data.get(coin_name, {}).get("usd")
+        return float(price) if price is not None else None
     
     return None
